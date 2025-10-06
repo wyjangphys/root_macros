@@ -21,7 +21,7 @@ void progress_bar(ULong64_t current_event, ULong64_t total_event) {
 	int cols = get_terminal_width();
 	if( cols < 0 ) cols = 80;
 	const char* FILLED = "█";
-	const char* EMPTY  = "░";
+	const char* EMPTY_BLK  = "░";
 
 	if (total_event <= 0) return;
 
@@ -37,7 +37,8 @@ void progress_bar(ULong64_t current_event, ULong64_t total_event) {
 	int percent = static_cast<int>(std::floor((double)current_event * 100.0 / total_event));
 	if (percent > 100) percent = 100;
 
-	int reserved = 8;
+  int num_digits_total = std::to_string(total_event).length();
+	int reserved = 10 + 2 * num_digits_total;
 	int bar_width = cols - reserved;
 	if (bar_width < 10) bar_width = 10;
 
@@ -51,9 +52,9 @@ void progress_bar(ULong64_t current_event, ULong64_t total_event) {
 	std::cout << "\r[";
 	for (int i = 0; i < bar_width; ++i) {
 		if (i < filled) std::cout << FILLED;   // filled block - \u2588 or U+2588 FULL BLOCK
-		else std::cout << EMPTY;           // empty block  - \u2591 or U+2591 LIGHT SHADE
+		else std::cout << EMPTY_BLK;           // empty block  - \u2591 or U+2591 LIGHT SHADE
 	}
-	std::cout << "] " << std::setw(3) << percent << "%";
+	std::cout << "] " << "(" << current_event << "/" << total_event << ")" << std::setw(3) << percent << "%";
 	std::cout.flush();
 
 	last_percent = percent;
